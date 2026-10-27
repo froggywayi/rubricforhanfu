@@ -2,344 +2,283 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>漢服現代融合設計 · 創作評分系統</title>
-  
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>傳統漢服元素與現代審美融合設計 - 創作評分系統</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN for Radar Dimension Chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Google Fonts: Noto Serif TC & Noto Sans TC -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons for touch-friendly iconography -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            cinnabar: {
-              DEFAULT: '#a83836',
-              dark: '#8b2e2c',
-              light: '#fdf2f2'
-            },
-            silk: {
-              DEFAULT: '#fdfbf7',
-              bg: '#f7f5f0',
-              border: '#e4dece'
-            },
-            gold: {
-              DEFAULT: '#b3882a',
-              light: '#fef9ec',
-              border: '#e5c97b'
-            }
-          },
-          fontFamily: {
-            serif: ['"Noto Serif TC"', 'serif'],
-            sans: ['"Noto Sans TC"', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
     body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #f7f5f0;
       color: #2b2b2b;
-      font-family: 'Noto Sans TC', sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-    .font-serif-tc {
-      font-family: 'Noto Serif TC', serif;
-    }
+    .font-serif-tc { font-family: 'Noto Serif TC', serif; }
+    .border-cinnabar { border-color: #a83836; }
+    .bg-cinnabar { background-color: #a83836; }
+    .text-cinnabar { color: #a83836; }
+    .bg-silk { background-color: #fdfbf7; }
 
-    /* iPad 觸控目標標準 (最小 44px) */
+    /* 針對 iPad 觸控優化尺寸與手勢 */
     .touch-target {
       min-height: 44px;
-      min-width: 44px;
     }
 
-    /* 橫向程度坐標標籤按鈕樣式 */
+    /* 橫向滾動容器平滑滑動 (支援 iPad 滑動手勢) */
+    .scroll-touch {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .scroll-touch::-webkit-scrollbar {
+      height: 4px;
+    }
+    .scroll-touch::-webkit-scrollbar-thumb {
+      background-color: #d6d3cb;
+      border-radius: 9999px;
+    }
+
+    /* 橫向程度坐標標籤樣式 */
     .level-step-btn {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s ease;
       font-size: 11px;
-      padding: 6px 11px;
-      border-radius: 6px;
+      padding: 6px 10px;
+      border-radius: 4px;
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      border: 1px solid transparent;
-      min-height: 34px;
+      touch-action: manipulation;
     }
     .level-step-btn.active {
       background-color: #a83836;
       color: #ffffff;
       font-weight: 700;
-      box-shadow: 0 1px 4px rgba(168, 56, 54, 0.35);
-      border-color: #8b2e2c;
+      box-shadow: 0 1px 3px rgba(168, 56, 54, 0.3);
     }
     .level-step-btn.inactive {
-      background-color: #ede7d8;
-      color: #555555;
+      background-color: #f3f0e6;
+      color: #666;
     }
     .level-step-btn.inactive:hover {
-      background-color: #dfd7c3;
-      color: #1a1a1a;
+      background-color: #e8e2d2;
+      color: #222;
     }
 
-    /* 列印與 PDF 匯出排版最佳化 */
     @media print {
       .no-print { display: none !important; }
-      body { background-color: #ffffff !important; color: #000000 !important; }
-      .print-break { page-break-inside: avoid; }
-      .print-shadow-none { box-shadow: none !important; border-color: #d1d5db !important; }
+      body { background-color: #ffffff; color: #000000; }
+      .print-page-break { page-break-inside: avoid; }
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-  <!-- 1. 頂部導航列 (支援電腦與 iPad 平板) -->
-  <header class="bg-silk border-b border-silk-border sticky top-0 z-30 shadow-xs no-print">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+  <!-- 頂部導航列（支援電腦與平板適應） -->
+  <header class="bg-silk border-b border-stone-200 sticky top-0 z-30 shadow-sm no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center space-x-3">
-        <span class="w-2.5 h-7 bg-cinnabar rounded-xs inline-block"></span>
+        <span class="w-2.5 h-6 bg-cinnabar rounded-sm inline-block"></span>
         <div>
-          <h1 class="text-base sm:text-lg font-bold font-serif-tc text-stone-900 leading-tight">
-            漢服現代融合設計 · 創作評分系統
-          </h1>
+          <h1 class="text-base sm:text-lg font-bold font-serif-tc text-stone-800 leading-tight">漢服現代融合設計 · 創作評分系統</h1>
           <p class="text-[11px] text-stone-500">視覺藝術科 · 8項全維度水平評核 (iPad / 電腦通用版)</p>
         </div>
       </div>
       
-      <div class="flex items-center gap-2.5 flex-wrap justify-end">
-        <!-- 一鍵載入示範手稿與評審結果 (金色按鈕) -->
-        <button onclick="loadDemoScenario()" 
-          class="touch-target px-3.5 py-2 rounded-lg bg-gold-light hover:bg-amber-100 border border-gold-border text-gold font-serif font-bold text-xs transition flex items-center gap-1.5 shadow-2xs active:scale-95">
-          <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
-          <span>一鍵載入示範手稿與評審結果</span>
-        </button>
-
-        <!-- Gemini API Key 輸入框（選填） -->
-        <div class="flex items-center gap-1.5 bg-stone-100 px-2.5 py-1 rounded-lg border border-stone-200">
-          <label for="apiKeyInput" class="text-[11px] text-stone-600 font-medium shrink-0">Gemini Key：</label>
-          <input type="password" id="apiKeyInput" placeholder="留空使用本地模擬評分" 
-            class="bg-white border border-stone-300 rounded px-2 py-1 text-xs w-36 sm:w-48 focus:outline-none focus:border-cinnabar">
-          <button onclick="toggleApiHelp()" class="touch-target px-1.5 text-stone-400 hover:text-stone-700 text-xs flex items-center justify-center">
-            <i class="fa-regular fa-circle-question text-sm"></i>
-          </button>
-        </div>
+      <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+        <label for="apiKeyInput" class="text-xs text-stone-600 font-medium shrink-0">Gemini Key：</label>
+        <input type="password" id="apiKeyInput" placeholder="留空使用本地模擬評分" 
+          class="border border-stone-300 rounded px-2.5 py-1.5 text-xs w-44 sm:w-56 focus:outline-none focus:ring-1 focus:ring-red-800 bg-white shadow-inner">
+        <button id="toggleApiHelp" class="touch-target px-2 text-stone-400 hover:text-stone-600 text-sm">ⓘ</button>
       </div>
     </div>
   </header>
 
   <!-- 主內容容器 -->
-  <main class="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex-grow w-full space-y-5">
+  <main class="max-w-6xl mx-auto px-4 py-4 sm:py-6 flex-grow w-full">
 
-    <!-- 2. 學生資訊列 -->
-    <div class="bg-silk border border-silk-border rounded-xl p-3.5 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3 text-sm">
-      <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+    <!-- 學生資訊列 -->
+    <div class="bg-silk border border-stone-200 rounded-lg p-3 sm:p-4 mb-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-3 sm:gap-6 text-sm w-full sm:w-auto">
         <div class="flex items-center">
-          <label class="text-stone-500 text-xs font-medium mr-1.5">學生姓名：</label>
-          <input type="text" id="studentName" value="陳芷晴" class="border-b border-stone-300 bg-transparent px-1.5 py-0.5 focus:border-cinnabar focus:outline-none font-medium w-28">
+          <label class="text-stone-500 font-medium mr-1 text-xs sm:text-sm">學生：</label>
+          <input type="text" id="studentName" value="陳同學" class="border-b border-stone-300 bg-transparent px-1 py-0.5 focus:border-cinnabar focus:outline-none font-medium w-24">
         </div>
         <div class="flex items-center">
-          <label class="text-stone-500 text-xs font-medium mr-1.5">班別 (座號)：</label>
-          <input type="text" id="studentClass" value="4A (12)" class="border-b border-stone-300 bg-transparent px-1.5 py-0.5 focus:border-cinnabar focus:outline-none font-medium w-24">
+          <label class="text-stone-500 font-medium mr-1 text-xs sm:text-sm">班別：</label>
+          <input type="text" id="studentClass" value="4A (12)" class="border-b border-stone-300 bg-transparent px-1 py-0.5 focus:border-cinnabar focus:outline-none font-medium w-20">
         </div>
-        <div class="text-xs sm:text-sm text-stone-700">
-          <span class="text-stone-400">創作主題：</span>結合傳統漢服元素與現代審美的個人創作
+        <div class="text-xs sm:text-sm text-stone-600">
+          <span class="text-stone-400">主題：</span>結合傳統漢服元素與現代審美
         </div>
       </div>
-
-      <div class="no-print">
-        <button onclick="window.print()" 
-          class="touch-target px-3.5 py-2 rounded-lg bg-white hover:bg-stone-50 border border-stone-300 text-stone-700 text-xs font-medium transition flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
-          <i class="fa-solid fa-print"></i> 列印 / 匯出 PDF 報告
+      <div class="no-print w-full sm:w-auto text-right">
+        <button onclick="window.print()" class="touch-target w-full sm:w-auto text-xs bg-stone-100 active:bg-stone-200 border border-stone-300 text-stone-700 px-3.5 py-2 rounded transition flex items-center justify-center gap-1.5 font-medium ml-auto">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          列印 / 匯出 PDF 報告
         </button>
       </div>
     </div>
 
-    <!-- 3. 設計意念與元素選取區 -->
-    <div class="bg-silk border border-silk-border rounded-xl p-4 sm:p-5 shadow-xs text-xs space-y-4">
-      <h2 class="text-sm font-bold font-serif-tc text-stone-900 flex items-center">
-        <span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>設計意念與元素選取（創作參照）
+    <!-- 設計意念與元素選取區 -->
+    <div class="bg-silk border border-stone-200 rounded-lg p-4 sm:p-5 mb-6 shadow-sm">
+      <h2 class="text-sm sm:text-base font-bold font-serif-tc text-stone-800 mb-3 flex items-center">
+        <span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>設計意念與元素選取
       </h2>
-
-      <!-- a. 傳統漢服特色選取（秦漢、魏晉南北朝、唐、宋、明，各3項） -->
-      <div class="bg-white border border-stone-200 rounded-lg p-3 sm:p-3.5">
-        <span class="font-bold text-stone-800 block mb-2.5 text-xs font-serif-tc">
-          1. 傳統漢服特色選取（可依設計複選）：
-        </span>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+      
+      <div class="space-y-4 text-xs">
+        
+        <!-- 傳統漢服特色選取（五朝代各 3 項） -->
+        <div class="border border-stone-200 bg-white rounded p-3">
+          <span class="font-bold text-stone-800 block mb-2 text-[13px]">1. 傳統漢服特色選取（可複選）：</span>
           
-          <!-- 秦漢時期 -->
-          <div class="bg-stone-50/80 p-2.5 rounded-md border border-stone-200">
-            <span class="font-bold text-cinnabar block mb-1.5 font-serif-tc">a. 秦漢時期</span>
-            <div class="space-y-1.5">
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="秦漢-交領右衽" class="rounded text-cinnabar focus:ring-cinnabar">交領右衽</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="秦漢-袖口緣邊" class="rounded text-cinnabar focus:ring-cinnabar">袖口緣邊</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="秦漢-直裾下擺" class="rounded text-cinnabar focus:ring-cinnabar">直裾下擺</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <!-- 秦漢 -->
+            <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
+              <span class="font-bold text-cinnabar block mb-1.5">a. 秦漢時期</span>
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="秦漢-交領右衽" class="w-4 h-4 rounded text-red-800">交領右衽</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="秦漢-袖口緣邊" class="w-4 h-4 rounded text-red-800">袖口緣邊</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="秦漢-直裾下擺" class="w-4 h-4 rounded text-red-800">直裾下擺</label>
+              </div>
             </div>
-          </div>
 
-          <!-- 魏晉南北朝 -->
-          <div class="bg-stone-50/80 p-2.5 rounded-md border border-stone-200">
-            <span class="font-bold text-cinnabar block mb-1.5 font-serif-tc">b. 魏晉南北朝</span>
-            <div class="space-y-1.5">
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="魏晉-窄袖襦" class="rounded text-cinnabar focus:ring-cinnabar">窄袖襦</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="魏晉-襦裙分層" class="rounded text-cinnabar focus:ring-cinnabar">襦裙分層</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="魏晉-及地長裙" class="rounded text-cinnabar focus:ring-cinnabar">及地長裙</label>
+            <!-- 魏晉南北朝 -->
+            <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
+              <span class="font-bold text-cinnabar block mb-1.5">b. 魏晉南北朝</span>
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="魏晉-窄袖襦" class="w-4 h-4 rounded text-red-800">窄袖襦</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="魏晉-襦裙分層" class="w-4 h-4 rounded text-red-800">襦裙分層</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="魏晉-及地長裙" class="w-4 h-4 rounded text-red-800">及地長裙</label>
+              </div>
             </div>
-          </div>
 
-          <!-- 唐代 -->
-          <div class="bg-stone-50/80 p-2.5 rounded-md border border-stone-200">
-            <span class="font-bold text-cinnabar block mb-1.5 font-serif-tc">c. 唐代</span>
-            <div class="space-y-1.5">
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="唐代-交領小袖" class="rounded text-cinnabar focus:ring-cinnabar">交領小袖</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="唐代-高束裙腰" class="rounded text-cinnabar focus:ring-cinnabar">高束裙腰</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="唐代-垂背披帛" class="rounded text-cinnabar focus:ring-cinnabar">垂背披帛</label>
+            <!-- 唐代 -->
+            <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
+              <span class="font-bold text-cinnabar block mb-1.5">c. 唐代</span>
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="唐代-交領小袖" class="w-4 h-4 rounded text-red-800">交領小袖</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="唐代-高束裙腰" class="w-4 h-4 rounded text-red-800">高束裙腰</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="唐代-垂背披帛" class="w-4 h-4 rounded text-red-800">垂背披帛</label>
+              </div>
             </div>
-          </div>
 
-          <!-- 宋代 -->
-          <div class="bg-stone-50/80 p-2.5 rounded-md border border-stone-200">
-            <span class="font-bold text-cinnabar block mb-1.5 font-serif-tc">d. 宋代</span>
-            <div class="space-y-1.5">
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="宋代-直領對襟" class="rounded text-cinnabar focus:ring-cinnabar">直領對襟</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="宋代-窄袖緣邊" class="rounded text-cinnabar focus:ring-cinnabar">窄袖緣邊</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="宋代-側衩與內層" class="rounded text-cinnabar focus:ring-cinnabar">側衩與內層</label>
+            <!-- 宋代 -->
+            <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
+              <span class="font-bold text-cinnabar block mb-1.5">d. 宋代</span>
+              <div class="space-y-1.5">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="宋代-直領對襟" class="w-4 h-4 rounded text-red-800">直領對襟</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="宋代-窄袖緣邊" class="w-4 h-4 rounded text-red-800">窄袖緣邊</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="宋代-側衩與內層" class="w-4 h-4 rounded text-red-800">側衩與內層</label>
+              </div>
             </div>
-          </div>
 
-          <!-- 明代 -->
-          <div class="bg-stone-50/80 p-2.5 rounded-md border border-stone-200">
-            <span class="font-bold text-cinnabar block mb-1.5 font-serif-tc">e. 明代</span>
-            <div class="space-y-1.5">
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="明代-直領對襟" class="rounded text-cinnabar focus:ring-cinnabar">直領對襟</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="明代-長短袖疊穿" class="rounded text-cinnabar focus:ring-cinnabar">長短袖疊穿</label>
-              <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="hanfu_element" value="明代-中央與側摺" class="rounded text-cinnabar focus:ring-cinnabar">中央與側摺</label>
+            <!-- 明代 -->
+            <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100 md:col-span-2">
+              <span class="font-bold text-cinnabar block mb-1.5">e. 明代</span>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="明代-直領對襟" class="w-4 h-4 rounded text-red-800">直領對襟</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="明代-長短袖疊穿" class="w-4 h-4 rounded text-red-800">長短袖疊穿</label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="hanfu_element" value="明代-中央與側摺" class="w-4 h-4 rounded text-red-800">中央與側摺</label>
+              </div>
             </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- b. 融合現代元素 + c. 圖案概念輸入 -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
-        <!-- 現代元素 -->
-        <div class="md:col-span-7 bg-white border border-stone-200 rounded-lg p-3 sm:p-3.5">
-          <span class="font-bold text-stone-800 block mb-2 text-xs font-serif-tc">
-            2. 融合現代元素（可複選）：
-          </span>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="口袋" class="rounded text-cinnabar focus:ring-cinnabar">口袋</label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="卡扣" class="rounded text-cinnabar focus:ring-cinnabar">卡扣</label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="彈性繩扣" class="rounded text-cinnabar focus:ring-cinnabar">彈性繩扣</label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="透視紗網" class="rounded text-cinnabar focus:ring-cinnabar">透視紗網</label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="金屬鍊條" class="rounded text-cinnabar focus:ring-cinnabar">金屬鍊條</label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="拼布" class="rounded text-cinnabar focus:ring-cinnabar">拼布</label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="銀色金屬光澤塗層" class="rounded text-cinnabar focus:ring-cinnabar">銀色金屬光澤塗層</label>
-            <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" name="modern_element" value="拉鍊" class="rounded text-cinnabar focus:ring-cinnabar">拉鍊</label>
-            <label class="flex items-center gap-1.5 cursor-pointer font-bold text-cinnabar col-span-2">
-              <input type="checkbox" id="modernCustomCheck" class="rounded text-cinnabar focus:ring-cinnabar">自訂 (自行輸入)
-            </label>
-          </div>
-          <div id="modernCustomBox" class="mt-2.5">
-            <input type="text" id="modernCustomInput" value="白色西裝翻領襯衫、棕色綁帶馬汀短靴" 
-              placeholder="請輸入自訂現代元素（例如：連帽剪裁、反光飾條等）" 
-              class="w-full border border-stone-300 rounded px-2.5 py-1 text-xs focus:outline-none focus:border-cinnabar bg-stone-50">
           </div>
         </div>
 
-        <!-- 圖案概念輸入 -->
-        <div class="md:col-span-5 bg-white border border-stone-200 rounded-lg p-3 sm:p-3.5 flex flex-col justify-between">
-          <div>
-            <span class="font-bold text-stone-800 block mb-1 text-xs font-serif-tc">
-              3. 圖案的概念輸入（自訂輸入）：
-            </span>
-            <p class="text-[11px] text-stone-400 mb-1.5">請描述設計中採用的紋飾、圖案或跨文化意念：</p>
-            <textarea id="patternInput" rows="3" placeholder="在此輸入圖案靈感..." 
-              class="w-full border border-stone-300 rounded p-2 text-xs focus:outline-none focus:border-cinnabar bg-stone-50 resize-none leading-relaxed">西洋撲克牌（黑桃A、梅花A、方塊等紙牌圖樣）結合東方傳統海浪山水波紋、雲紋，以及下擺邊緣的幾何回紋飾邊。</textarea>
+        <!-- 融合現代元素 + 圖案概念輸入 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 現代元素 -->
+          <div class="border border-stone-200 bg-white rounded p-3">
+            <span class="font-bold text-stone-800 block mb-2 text-[13px]">2. 融合現代元素（可複選）：</span>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="口袋" class="w-4 h-4 rounded text-red-800">口袋</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="卡扣" class="w-4 h-4 rounded text-red-800">卡扣</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="彈性繩扣" class="w-4 h-4 rounded text-red-800">彈性繩扣</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="透視紗網" class="w-4 h-4 rounded text-red-800">透視紗網</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="金屬鍊條" class="w-4 h-4 rounded text-red-800">金屬鍊條</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="拼布" class="w-4 h-4 rounded text-red-800">拼布</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="銀色金屬光澤塗層" class="w-4 h-4 rounded text-red-800">銀色金屬光澤塗層</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="拉鍊" class="w-4 h-4 rounded text-red-800">拉鍊</label>
+              <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="modernCustomCheck" class="w-4 h-4 rounded text-red-800">自訂</label>
+            </div>
+            <input type="text" id="modernCustomInput" placeholder="請輸入自訂現代元素（例：襯衫翻領、短靴、機能織帶...）" 
+              class="mt-2 w-full border border-stone-200 rounded px-2.5 py-1.5 text-xs focus:outline-none focus:border-cinnabar hidden bg-stone-50">
+          </div>
+
+          <!-- 圖案概念輸入 -->
+          <div class="border border-stone-200 bg-white rounded p-3 flex flex-col justify-between">
+            <div>
+              <span class="font-bold text-stone-800 block mb-2 text-[13px]">3. 圖案的概念輸入（自訂輸入）：</span>
+              <p class="text-stone-400 mb-1.5">請描述設計中運用的紋樣或圖案靈感</p>
+              <textarea id="patternInput" rows="3" placeholder="在此輸入圖案意念..." 
+                class="w-full border border-stone-200 rounded p-2 text-xs focus:outline-none focus:border-cinnabar bg-stone-50 resize-none"></textarea>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- 4. 評量主體區塊 (響應式雙欄佈局) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <!-- 評量主體區塊 -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
-      <!-- 左欄：相片上傳/預覽 + 能力維度分佈 (5 cols) -->
-      <div class="lg:col-span-5 space-y-4">
+      <!-- 左欄：相片上傳 + 能力維度分佈（不顯示數字總分） -->
+      <div class="lg:col-span-5 space-y-4 sm:space-y-6">
         
-        <!-- 作品圖片上傳區 -->
-        <div class="bg-silk border border-silk-border rounded-xl p-4 shadow-xs">
-          <div class="flex items-center justify-between mb-2">
-            <h2 class="text-sm font-bold font-serif-tc text-stone-900 flex items-center">
-              <span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>作品圖片（拍照或上傳）
-            </h2>
-            <span class="text-[11px] text-stone-400">支援 iPad 即拍或電腦拖曳</span>
-          </div>
+        <div class="bg-silk border border-stone-200 rounded-lg p-4 sm:p-5 shadow-sm">
+          <h2 class="text-sm sm:text-base font-bold font-serif-tc text-stone-800 mb-2 sm:mb-3 flex items-center">
+            <span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>作品圖片（拍照或上傳）
+          </h2>
           
-          <div id="dropZone" class="border-2 border-dashed border-stone-300 active:border-cinnabar rounded-xl p-3 text-center cursor-pointer bg-white relative flex flex-col items-center justify-center min-h-[220px] overflow-hidden">
+          <div id="dropZone" class="border-2 border-dashed border-stone-300 active:border-cinnabar transition-colors rounded-lg p-4 text-center cursor-pointer bg-white relative flex flex-col items-center justify-center min-h-[220px] sm:min-h-[280px]">
+            <!-- 加上 capture 屬性，在 iPad 上點擊會自動彈出「拍照、照片圖庫、選擇檔案」選項 -->
             <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
             
-            <div id="uploadPrompt" class="space-y-1.5 pointer-events-none hidden">
-              <i class="fa-solid fa-camera text-2xl text-stone-400"></i>
-              <p class="text-xs text-stone-600 font-medium">點擊拍照或上傳手繪畫作</p>
-              <p class="text-[10px] text-stone-400">iPad 相機即拍即評 · 電腦支援拖放</p>
+            <div id="uploadPrompt" class="space-y-2 pointer-events-none">
+              <div class="mx-auto w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              </div>
+              <p class="text-sm text-stone-700 font-medium">點擊拍照或選取照片</p>
+              <p class="text-xs text-stone-400">iPad 支援相機即拍即評 · 電腦可拖曳檔案</p>
             </div>
 
-            <div id="previewContainer" class="w-full flex flex-col items-center">
-              <img id="imagePreview" src="" alt="手繪稿件預覽" class="max-h-60 w-auto object-contain rounded-lg border border-stone-200 shadow-2xs">
-              <p class="text-[10px] text-stone-400 mt-1.5">輕觸或拖曳可更換其他圖片</p>
+            <div id="previewContainer" class="hidden w-full flex flex-col items-center">
+              <img id="imagePreview" src="" alt="預覽作品" class="max-h-60 sm:max-h-72 w-auto object-contain rounded shadow-sm border border-stone-200">
+              <p class="text-[11px] text-stone-400 mt-2">輕觸可重新拍照或更換圖片</p>
             </div>
           </div>
 
-          <button id="btnEvaluate" onclick="triggerEvaluation()" 
-            class="touch-target mt-3 w-full bg-cinnabar hover:bg-cinnabar-dark text-white py-2.5 rounded-lg font-medium text-xs tracking-wide shadow-xs transition flex items-center justify-center gap-2 active:scale-98">
-            <span id="btnEvaluateText">開始評估作品</span>
-            <div id="evalSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <button id="evaluateBtn" disabled class="touch-target mt-3 w-full bg-cinnabar text-white py-2.5 rounded font-medium tracking-wide shadow transition active:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <span id="btnText">開始評估作品</span>
+            <div id="btnSpinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           </button>
         </div>
 
-        <!-- 能力維度分佈（不顯示數字總分，純文字程度等級徽章） -->
-        <div id="summaryCard" class="bg-silk border border-silk-border rounded-xl p-4 shadow-xs print-break">
-          <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-stone-200">
-            <h2 class="text-sm font-bold font-serif-tc text-stone-900 flex items-center">
-              <span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>能力維度分佈
-            </h2>
-            <span class="text-[11px] text-stone-400">8項指標形態分析</span>
-          </div>
-
-          <div class="bg-stone-50 p-3.5 rounded-lg border border-stone-200 mb-3 text-center">
-            <p class="text-[11px] text-stone-500 mb-1">作品當前整體表現程度</p>
-            <div id="overallLevelBadge" class="inline-block px-5 py-1.5 rounded-full text-xs font-bold text-white shadow-xs transition-all">
-              熟練
+        <!-- 能力維度分佈（不顯示數字總分，只顯示作品程度） -->
+        <div id="summaryCard" class="hidden bg-silk border border-stone-200 rounded-lg p-4 sm:p-5 shadow-sm print-page-break">
+          <h2 class="text-sm sm:text-base font-bold font-serif-tc text-stone-800 mb-3 flex items-center justify-between">
+            <span class="flex items-center"><span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>能力維度分佈</span>
+          </h2>
+          
+          <div class="bg-stone-50 p-3.5 rounded border border-stone-200 mb-4 text-center">
+            <p class="text-xs text-stone-500 mb-1">作品當前整體表現程度</p>
+            <div id="currentLevelDisplay" class="inline-block px-4 py-1.5 rounded-full text-sm font-bold shadow-sm transition-all">
+              --
             </div>
-            
-            <!-- 5 級範圍鏈指示器 -->
-            <div class="mt-2.5 pt-2 border-t border-stone-200 text-[10px] text-stone-500 flex flex-wrap justify-center gap-1.5 font-medium">
-              <span id="tier-level-5" class="px-2 py-0.5 rounded">卓越</span>
-              <span class="text-stone-300">›</span>
-              <span id="tier-level-4" class="px-2 py-0.5 rounded">熟練</span>
-              <span class="text-stone-300">›</span>
-              <span id="tier-level-3" class="px-2 py-0.5 rounded">基礎 / 達標</span>
-              <span class="text-stone-300">›</span>
-              <span id="tier-level-2" class="px-2 py-0.5 rounded">部分達標</span>
-              <span class="text-stone-300">›</span>
-              <span id="tier-level-1" class="px-2 py-0.5 rounded">尚未掌握核心能力</span>
+            <div class="mt-2 text-[11px] text-stone-400 flex flex-wrap justify-center gap-1.5 border-t border-stone-200 pt-2">
+              <span class="px-1.5 py-0.5 rounded bg-stone-100">卓越</span>
+              <span>›</span>
+              <span class="px-1.5 py-0.5 rounded bg-stone-100">熟練</span>
+              <span>›</span>
+              <span class="px-1.5 py-0.5 rounded bg-stone-100">基礎 / 達標</span>
+              <span>›</span>
+              <span class="px-1.5 py-0.5 rounded bg-stone-100">部分達標</span>
+              <span>›</span>
+              <span class="px-1.5 py-0.5 rounded bg-stone-100">尚未掌握核心能力</span>
             </div>
           </div>
 
-          <!-- 雷達圖視覺化（隱藏刻度數字，純看形態分佈） -->
           <div class="w-full h-56 sm:h-64">
             <canvas id="radarChart"></canvas>
           </div>
@@ -347,24 +286,28 @@
 
       </div>
 
-      <!-- 右欄：8項評審指標與橫向程度按鈕 (7 cols) -->
-      <div class="lg:col-span-7 space-y-4">
+      <!-- 右欄：8項評審指標與改善意見（橫向程度坐標） -->
+      <div class="lg:col-span-7">
         
-        <div class="bg-silk border border-silk-border rounded-xl p-4 sm:p-5 shadow-xs">
+        <div class="bg-silk border border-stone-200 rounded-lg p-4 sm:p-5 shadow-sm">
           <div class="flex flex-wrap items-center justify-between border-b border-stone-200 pb-2.5 mb-3 gap-2">
             <div>
-              <h2 class="text-base font-bold font-serif-tc text-stone-900">各項評審指標與改善意見</h2>
-              <p class="text-[11px] text-stone-500 mt-0.5">橫向程度坐標評估 · 點擊標籤可直接調整等級</p>
+              <h2 class="text-base sm:text-lg font-bold font-serif-tc text-stone-800">各項評審指標與改善意見</h2>
+              <p class="text-[11px] text-stone-500">橫向程度坐標評估 · 點擊標籤可直接調整等級</p>
             </div>
-            <span class="text-[10px] px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-600 rounded">
-              可隨時手動微調
+            <span class="text-[11px] px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-600 rounded">
+              水平進展基準
             </span>
           </div>
 
-          <!-- 8 項指標清單容器 -->
-          <div id="criteriaList" class="space-y-3.5">
-            <!-- 初始由 JS 渲染 -->
+          <!-- 8項評分列表容器 -->
+          <div id="criteriaList" class="space-y-4">
+            <div id="emptyNotice" class="text-center py-12 text-stone-400">
+              <svg class="mx-auto h-8 w-8 mb-1.5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <p class="text-xs sm:text-sm">請於上方確認元素選取並上傳作品，系統將提供各項水平坐標與改善意見</p>
+            </div>
           </div>
+
         </div>
 
       </div>
@@ -372,29 +315,12 @@
     </div>
   </main>
 
-  <!-- 說明彈窗 Modal -->
-  <div id="helpModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4" onclick="toggleApiHelp()">
-    <div class="bg-white rounded-xl max-w-md w-full p-5 text-xs text-stone-700 space-y-3 shadow-xl" onclick="event.stopPropagation()">
-      <div class="flex items-center justify-between border-b pb-2">
-        <h3 class="font-bold text-sm font-serif-tc text-stone-900">系統評核指引與使用提示</h3>
-        <button onclick="toggleApiHelp()" class="text-stone-400 hover:text-stone-700 text-base">&times;</button>
-      </div>
-      <p><strong>1. 本地教學模式：</strong>留空 API Key 即可使用內建專業評審邏輯與示範資料，點擊右上角「一鍵載入示範手稿與評審結果」即可演示。</p>
-      <p><strong>2. 橫向程度按鈕：</strong>每項指標均設有 6 個橫向水平按鈕，老師或學生可直接點選調整，雷達圖與整體評級會即時連動。</p>
-      <p><strong>3. 雙向回饋：</strong>每項指標分為「a. 欣賞之處」與「b. 不足之處及改善意見」兩組獨立可編輯文字方塊，方便因材施教。</p>
-      <p><strong>4. 去數值化：</strong>完全不顯示阿拉伯數字總分，依內部權重自動換算為「卓越、熟練、基礎/達標、部分達標，但表現不夠穩定、尚未掌握核心能力」。</p>
-      <div class="text-right pt-2">
-        <button onclick="toggleApiHelp()" class="px-3.5 py-1.5 bg-cinnabar text-white rounded-md text-xs font-medium">我知道了</button>
-      </div>
-    </div>
-  </div>
-
-  <footer class="bg-stone-100 border-t border-stone-200 py-3.5 text-center text-[11px] text-stone-500 no-print mt-auto">
-    漢服現代融合設計評分系統 · 視覺藝術素養導向校本評核工具 (iPad / 電腦通用版)
+  <footer class="bg-stone-100 border-t border-stone-200 py-3 text-center text-[11px] text-stone-500 no-print mt-auto">
+    漢服現代融合設計評分系統 · 視覺藝術素養導向評量 (iPad / 電腦通用版)
   </footer>
 
   <script>
-    // 6 級橫向程度坐標定義
+    // 六級橫向程度坐標定義
     const SCALE_LEVELS = [
       { score: 5, label: "展示豐富而全面地運用" },
       { score: 4, label: "良好運用" },
@@ -404,266 +330,148 @@
       { score: 0, label: "從沒運用" }
     ];
 
-    // 8 項評審指標標準定義
     const CRITERIA_DEFINITIONS = [
-      { 
-        id: 1, 
-        category: "主題與元素融合", 
-        name: "傳統漢服形制與特徵呈現", 
-        guide: "直領對襟、交領右衽、長短袖疊穿、中央與側摺（馬面裙門）等形制特徵交代之考究度。" 
-      },
-      { 
-        id: 2, 
-        category: "主題與元素融合", 
-        name: "現代審美與時尚感結合", 
-        guide: "當代白色西裝翻領襯衫、棕色綁帶短靴等現代剪裁與配件之融入，視覺穿搭之協調性與潮流感。" 
-      },
-      { 
-        id: 3, 
-        category: "文化轉化與功能設計", 
-        name: "文化符號與紋樣當代轉化", 
-        guide: "西洋撲克牌符號與傳統山水海浪、雲紋、下擺幾何回紋的跨文化拼貼重構與當代轉化力。" 
-      },
-      { 
-        id: 4, 
-        category: "文化轉化與功能設計", 
-        name: "服裝結構邏輯與材質表現", 
-        guide: "外罩無袖坎肩與寬袖大袖疊穿邏輯合理性，以及薄紗垂墜、挺括棉麻與皮革短靴之質感表現。" 
-      },
-      { 
-        id: 5, 
-        category: "構圖與創意表現", 
-        name: "獨特創意與概念設計", 
-        guide: "破除傳統古裝舞台刻板印象，構思新穎大膽，展現鮮明且富感染力的個人設計風格。" 
-      },
-      { 
-        id: 6, 
-        category: "構圖與創意表現", 
-        name: "人物動態與版面構圖", 
-        guide: "人物體態流暢自然，手臂動態與下擺展開張弛有度，畫面視覺主次中心突出。" 
-      },
-      { 
-        id: 7, 
-        category: "繪畫與技法", 
-        name: "線條清晰度與細節勾勒", 
-        guide: "外輪廓線條之流暢俐落度，衣物褶皺走勢、胸前雙交叉金屬鏈條與邊界細節之嚴謹性。" 
-      },
-      { 
-        id: 8, 
-        category: "繪畫與技法", 
-        name: "色彩漸變與立體光影", 
-        guide: "大袖藍粉漸變過渡、裙身明黃配色的雅緻感，以及明暗對比在布料立體空間厚度上的塑造。" 
-      }
+      { id: 1, category: "主題與元素融合", name: "傳統漢服形制與特徵呈現", guide: "所選朝代之剪裁、門襟與結構特徵考究度" },
+      { id: 2, category: "主題與元素融合", name: "現代審美與時尚感結合", guide: "當代剪裁、日常/潮流感之融合與視覺協調度" },
+      { id: 3, category: "文化轉化與功能設計", name: "文化符號與紋樣當代轉化", guide: "傳統幾何/植物紋飾、配飾之現代化提煉與構思" },
+      { id: 4, category: "文化轉化與功能設計", name: "服裝結構邏輯與材質表現", guide: "可穿戴結構合理度，以及絲、麻、機能料等質感筆觸" },
+      { id: 5, category: "構圖與創意表現", name: "獨特創意與概念設計", guide: "破除刻板印象的新穎構想與個人風格" },
+      { id: 6, category: "構圖與創意表現", name: "人物動態與版面構圖", guide: "人體比例、姿態優雅度與主次視覺張力" },
+      { id: 7, category: "繪畫與技法", name: "線條清晰度與細節勾勒", guide: "輪廓流暢度、褶皺垂墜感及細節刻畫之精緻度" },
+      { id: 8, category: "繪畫與技法", name: "色彩漸變與立體光影", guide: "配色意境、明暗立體感與布料光影層次" }
     ];
 
-    // 示範資料組（包含手繪作品向量、勾選項目及 8 項各具欣賞與改善意見）
-    const DEMO_SCENARIO_DATA = {
-      studentName: "陳芷晴",
-      studentClass: "4A (12)",
-      hanfuElements: ["明代-直領對襟", "明代-長短袖疊穿", "明代-中央與側摺"],
-      modernElements: ["金屬鍊條", "拼布"],
-      customModern: "白色西裝翻領襯衫、棕色綁帶馬汀短靴",
-      patternText: "西洋撲克牌（黑桃A、梅花A、方塊等紙牌圖樣）結合東方傳統海浪山水波紋、雲紋，以及下擺邊緣的幾何回紋飾邊。",
-      scores: [4, 5, 5, 4, 5, 4, 3, 4],
-      praises: [
-        "清楚準確地再現了明代直領外搭與馬面裙前後平整門襟的結構，腰間繫帶比例適宜，展現漢服端莊的垂墜韻致。",
-        "大膽融入白色襯衫西裝翻領與俐落綁帶短靴，破除傳統古風的厚重感，極具當代街頭高級感與實穿美學。",
-        "將西洋撲克牌（黑桃A/梅花A）與傳統海水江崖、如意雲紋無縫拼貼，跨文化符號轉化極具張力與原創哲思。",
-        "外層無袖坎肩與內襯寬袖的疊穿邏輯嚴密，馬面裙側摺與打褶層次清晰，穿戴結構具高度可行性。",
-        "構思大膽新穎，成功擺脫常見古裝的既定公式，賦予傳統漢服極為鮮明的年輕潮流個性。",
-        "人物姿態大方舒展，左臂延伸引導視覺流動，下裳展開形成穩固三角構圖，版面主次分明。",
-        "主體輪廓線順暢俐落，裙門圖案與下擺回紋刻畫細緻嚴謹，細節辨識度高。",
-        "大袖的天藍至桃粉漸變自然柔和，與鵝黃色裙身形成高雅的對比，色彩氛圍兼具古典雅韻與現代活力。"
-      ],
-      suggestions: [
-        "裙門中央的開衩分界處可進一步交代內層襯裙的露底關係，以提升結構立體層次感。",
-        "金屬鏈條的端點固定件可補充現代五金或小巧金屬環細節，增添精工設計質感。",
-        "下擺邊緣幾何回紋在轉角處的疏密排列可更加均勻，避免少數折角處圖形擠壓。",
-        "可透過筆觸微調加強皮質短靴與真絲緞面大袖之間的軟硬光澤反差，豐富質感層次。",
-        "可嘗試在鞋帶或腰帶末端加入呼應撲克牌花色的細微暗紋，讓整體系列概念更加收攏。",
-        "背景空間略顯留白，未來可考慮適當點綴極淡的現代都市建築幾何暗影以強化情境呼應。",
-        "胸前交叉鏈條與衣領交界處有少許複筆重疊，建議運筆時一次到位，維持線條的純粹清爽。",
-        "馬面裙打褶內層的陰影深度可再加深半階，能使裙身的立體厚度與重力懸垂感更顯突出。"
-      ],
-      // 高擬真示範作品手繪稿 (向量繪製還原襯衫領、交叉金鍊、漸變大袖、撲克牌馬面裙、短靴)
-      svgArtwork: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" width="100%" height="100%"><rect width="500" height="700" fill="%23fcfbfa"/><text x="290" y="38" font-size="11" fill="%23777" font-family="sans-serif">現代元素: 西裝領、撲克牌、金屬鍊、短靴</text><defs><linearGradient id="sleeveL" x1="0" y1="0" x2="1" y2="1"><stop offset="0%23" stop-color="%235dade2"/><stop offset="100%23" stop-color="%23f1948a"/></linearGradient><linearGradient id="sleeveR" x1="0" y1="0" x2="1" y2="1"><stop offset="0%23" stop-color="%235dade2"/><stop offset="100%23" stop-color="%23f1948a"/></linearGradient></defs><g stroke="%23333333" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M180 200 L80 230 L110 350 L170 320 Z" fill="url(%23sleeveL)"/><path d="M320 200 L420 230 L390 350 L330 320 Z" fill="url(%23sleeveR)"/><circle cx="250" cy="115" r="26" fill="%23fdebd0"/><path d="M224 105 Q250 70 276 105 Q285 145 270 150 Q250 140 230 150 Z" fill="%233e2723"/><path d="M210 180 Q250 150 290 180 L320 255 L180 255 Z" fill="%23f9f8f5"/><polygon points="235,160 250,185 265,160" fill="%23ffffff"/><line x1="225" y1="190" x2="275" y2="235" stroke="%23c59b27" stroke-width="2.2"/><line x1="275" y1="190" x2="225" y2="235" stroke="%23c59b27" stroke-width="2.2"/><circle cx="225" cy="190" r="3.5" fill="%23c59b27"/><circle cx="275" cy="190" r="3.5" fill="%23c59b27"/><circle cx="225" cy="235" r="3.5" fill="%23c59b27"/><circle cx="275" cy="235" r="3.5" fill="%23c59b27"/><rect x="215" y="255" width="70" height="15" fill="%23f5b7b1"/><path d="M225 270 L220 330 L235 325 L235 270 Z" fill="%23f5b7b1"/><path d="M180 270 L130 550 Q250 580 370 550 L320 270 Z" fill="%23fff9db"/><path d="M210 270 L180 470 L240 480 L245 270 Z" fill="%23fff3b0"/><path d="M255 270 L260 480 L320 470 L290 270 Z" fill="%23fff3b0"/><rect x="185" y="380" width="48" height="66" fill="%23ffffff" rx="3"/><text x="190" y="402" font-size="14" font-weight="bold" fill="%23111">A♠</text><rect x="268" y="380" width="48" height="66" fill="%23ffffff" rx="3"/><text x="273" y="402" font-size="14" font-weight="bold" fill="%23a83836">A♣</text><path d="M190 350 Q215 330 240 350 Q220 370 190 350 Z" fill="%23f1948a" opacity="0.8"/><path d="M270 350 Q295 330 320 350 Q300 370 270 350 Z" fill="%23f1948a" opacity="0.8"/><path d="M135 540 L365 540 L360 555 L140 555 Z" fill="%23a83836"/><path d="M140 545 H360" stroke="%23ffd700" stroke-width="1.8" stroke-dasharray="4,3"/><rect x="375" y="525" width="26" height="55" rx="3" fill="%23a0522d"/><rect x="405" y="525" width="26" height="55" rx="3" fill="%238b4513"/></g></svg>`
-    };
-
-    // 運行狀態
-    let currentCriteriaScores = [...DEMO_SCENARIO_DATA.scores];
-    let currentPraises = [...DEMO_SCENARIO_DATA.praises];
-    let currentSuggestions = [...DEMO_SCENARIO_DATA.suggestions];
+    let currentImageData = null;
     let radarChartInstance = null;
+    let currentCriteriaScores = [3, 3, 3, 3, 3, 3, 3, 3];
 
-    // 頁面初始化
-    window.onload = function() {
-      setupDropZoneAndUpload();
-      loadDemoScenario();
-    };
+    // 自訂現代元素切換
+    const modernCustomCheck = document.getElementById('modernCustomCheck');
+    const modernCustomInput = document.getElementById('modernCustomInput');
+    modernCustomCheck.addEventListener('change', () => {
+      modernCustomInput.classList.toggle('hidden', !modernCustomCheck.checked);
+      if (modernCustomCheck.checked) modernCustomInput.focus();
+    });
 
-    // 拖曳上傳與檔案事件 (iPad 相機拍照與電腦通用)
-    function setupDropZoneAndUpload() {
-      const dropZone = document.getElementById('dropZone');
-      const fileInput = document.getElementById('fileInput');
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const evaluateBtn = document.getElementById('evaluateBtn');
+    const btnText = document.getElementById('btnText');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const criteriaList = document.getElementById('criteriaList');
+    const emptyNotice = document.getElementById('emptyNotice');
+    const summaryCard = document.getElementById('summaryCard');
+    const currentLevelDisplay = document.getElementById('currentLevelDisplay');
 
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('border-cinnabar', 'bg-cinnabar-light');
-      });
-      dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('border-cinnabar', 'bg-cinnabar-light');
-      });
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-cinnabar', 'bg-cinnabar-light');
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-          handleUploadedFile(e.dataTransfer.files[0]);
-        }
-      });
-      fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-          handleUploadedFile(e.target.files[0]);
-        }
-      });
+    // 拖曳處理（電腦端）
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-cinnabar', 'bg-red-50/20'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-cinnabar', 'bg-red-50/20'); });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-cinnabar', 'bg-red-50/20');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
 
-      // 自訂現代元素輸入框連動
-      document.getElementById('modernCustomCheck').addEventListener('change', (e) => {
-        document.getElementById('modernCustomBox').classList.toggle('hidden', !e.target.checked);
-      });
-    }
+    // 點選檔案或相機拍照（iPad & 電腦通用）
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+    });
 
-    function handleUploadedFile(file) {
+    function handleFile(file) {
       if (!file.type.startsWith('image/')) {
-        alert('請選取或拍攝圖片格式檔案 (JPG, PNG等)！');
+        alert('請選取相片或拍照檔案！');
         return;
       }
       const reader = new FileReader();
       reader.onload = function(e) {
-        document.getElementById('imagePreview').src = e.target.result;
-        document.getElementById('uploadPrompt').classList.add('hidden');
-        document.getElementById('previewContainer').classList.remove('hidden');
+        currentImageData = e.target.result;
+        imagePreview.src = currentImageData;
+        uploadPrompt.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        evaluateBtn.disabled = false;
       };
       reader.readAsDataURL(file);
     }
 
-    // 一鍵載入示範手稿與評審結果
-    function loadDemoScenario() {
-      document.getElementById('studentName').value = DEMO_SCENARIO_DATA.studentName;
-      document.getElementById('studentClass').value = DEMO_SCENARIO_DATA.studentClass;
-
-      // 朝代特色打勾
-      document.querySelectorAll('input[name="hanfu_element"]').forEach(el => {
-        el.checked = DEMO_SCENARIO_DATA.hanfuElements.includes(el.value);
-      });
-
-      // 現代元素打勾
-      document.querySelectorAll('input[name="modern_element"]').forEach(el => {
-        el.checked = DEMO_SCENARIO_DATA.modernElements.includes(el.value);
-      });
-      document.getElementById('modernCustomCheck').checked = true;
-      document.getElementById('modernCustomBox').classList.remove('hidden');
-      document.getElementById('modernCustomInput').value = DEMO_SCENARIO_DATA.customModern;
-
-      // 圖案意念文字
-      document.getElementById('patternInput').value = DEMO_SCENARIO_DATA.patternText;
-
-      // 載入示範手繪畫作
-      document.getElementById('imagePreview').src = DEMO_SCENARIO_DATA.svgArtwork;
-      document.getElementById('uploadPrompt').classList.add('hidden');
-      document.getElementById('previewContainer').classList.remove('hidden');
-
-      // 重設示範資料
-      currentCriteriaScores = [...DEMO_SCENARIO_DATA.scores];
-      currentPraises = [...DEMO_SCENARIO_DATA.praises];
-      currentSuggestions = [...DEMO_SCENARIO_DATA.suggestions];
-
-      renderCriteriaCards();
-      updateOverallLevelAndChart();
-    }
-
-    function collectCurrentConcept() {
-      const hanfuList = Array.from(document.querySelectorAll('input[name="hanfu_element"]:checked')).map(e => e.value);
-      const modernList = Array.from(document.querySelectorAll('input[name="modern_element"]:checked')).map(e => e.value);
-      if (document.getElementById('modernCustomCheck').checked && document.getElementById('modernCustomInput').value.trim()) {
-        modernList.push(`自訂：${document.getElementById('modernCustomInput').value.trim()}`);
+    // 收集勾選意念
+    function collectStudentConcept() {
+      const hanfuElements = Array.from(document.querySelectorAll('input[name="hanfu_element"]:checked')).map(el => el.value);
+      const modernElements = Array.from(document.querySelectorAll('input[name="modern_element"]:checked')).map(el => el.value);
+      if (modernCustomCheck.checked && modernCustomInput.value.trim()) {
+        modernElements.push(`自訂：${modernCustomInput.value.trim()}`);
       }
+      const patternText = document.getElementById('patternInput').value.trim();
+
       return {
-        hanfu: hanfuList.length ? hanfuList.join('、') : '未特定標註',
-        modern: modernList.length ? modernList.join('、') : '未特定標註',
-        pattern: document.getElementById('patternInput').value.trim() || '未特定標註'
+        hanfu: hanfuElements.length ? hanfuElements.join('、') : '未特別指定',
+        modern: modernElements.length ? modernElements.join('、') : '未特別指定',
+        pattern: patternText ? patternText : '未特別指定'
       };
     }
 
-    // 開始評估作品（支援本地示範與 Gemini 雲端 API）
-    async function triggerEvaluation() {
-      const previewImg = document.getElementById('imagePreview');
-      if (!previewImg.src || previewImg.src === window.location.href) {
-        alert('請先上傳手繪畫作，或點擊右上角「一鍵載入示範手稿與評審結果」！');
-        return;
-      }
+    // 點擊開始評估
+    evaluateBtn.addEventListener('click', async () => {
+      if (!currentImageData) return;
+      const apiKey = apiKeyInput.value.trim();
+      const studentConcept = collectStudentConcept();
 
-      const apiKey = document.getElementById('apiKeyInput').value.trim();
-      const concept = collectCurrentConcept();
-      const btn = document.getElementById('btnEvaluate');
-      const btnText = document.getElementById('btnEvaluateText');
-      const spinner = document.getElementById('evalSpinner');
-
-      btn.disabled = true;
-      btnText.textContent = "AI 正在仔細審核各項準則...";
-      spinner.classList.remove('hidden');
-
+      setLoading(true);
       try {
+        let results;
         if (apiKey) {
-          const apiResults = await evaluateWithGemini(apiKey, previewImg.src, concept);
-          applyEvaluationResults(apiResults);
+          results = await evaluateWithGemini(apiKey, currentImageData, studentConcept);
         } else {
-          // 本地模擬快速運算
           await new Promise(r => setTimeout(r, 650));
-          currentCriteriaScores = [...DEMO_SCENARIO_DATA.scores];
-          currentPraises = [...DEMO_SCENARIO_DATA.praises];
-          currentSuggestions = [...DEMO_SCENARIO_DATA.suggestions];
-          renderCriteriaCards();
-          updateOverallLevelAndChart();
+          results = generateLocalMockEvaluation(studentConcept);
         }
+        renderEvaluationResults(results);
       } catch (err) {
         console.error(err);
-        alert(`評審過程發生提示：${err.message || '請確認 API 連線狀態，或留空 Key 使用本機模擬評分。'}`);
+        alert(`評分發生錯誤：${err.message || '請確認 API Key 或網路狀態'}`);
       } finally {
-        btn.disabled = false;
+        setLoading(false);
+      }
+    });
+
+    function setLoading(isLoading) {
+      evaluateBtn.disabled = isLoading;
+      if (isLoading) {
+        btnText.textContent = "AI 正在分析作品各項細節...";
+        btnSpinner.classList.remove('hidden');
+      } else {
         btnText.textContent = "重新評估作品";
-        spinner.classList.add('hidden');
+        btnSpinner.classList.add('hidden');
       }
     }
 
-    async function evaluateWithGemini(apiKey, imageSrc, concept) {
-      let mimeType = 'image/jpeg';
-      let pureBase64 = '';
+    // 調用 Gemini API 評核
+    async function evaluateWithGemini(apiKey, base64Image, concept) {
+      const pureBase64 = base64Image.split(',')[1];
+      const mimeType = base64Image.split(';')[0].split(':')[1] || 'image/jpeg';
 
-      if (imageSrc.startsWith('data:')) {
-        const parts = imageSrc.split(',');
-        mimeType = parts[0].split(';')[0].split(':')[1] || 'image/jpeg';
-        pureBase64 = parts[1];
-      } else {
-        throw new Error('請上傳本機圖片檔案以進行 API 分析。');
-      }
+      const prompt = `你是一位視覺藝術科評審。學生繪畫了「傳統漢服元素與現代審美融合設計」創作。
+【學生自述之設計意念】：
+1. 傳統漢服特色：${concept.hanfu}
+2. 現代審美元素：${concept.modern}
+3. 圖案概念：${concept.pattern}
 
-      const prompt = `你是一位資深的視覺藝術科科主任與服裝設計專家。請依據以下標準評閱學生提交的「傳統漢服元素與現代審美融合設計」畫作：
-【學生自述設計意念】：
-1. 傳統漢服形制特色：${concept.hanfu}
-2. 現代審美融合元素：${concept.modern}
-3. 紋樣圖案概念：${concept.pattern}
+請參考學生上述意念與作品圖片，依序評定以下 8 項指標之程度（每項給予 0 至 5 整數分數，盡量落在 2 至 4 分中間適度區間）：
+1. 傳統漢服形制與特徵呈現
+2. 現代審美與時尚感結合
+3. 文化符號與紋樣當代轉化
+4. 服裝結構邏輯與材質表現
+5. 獨特創意與概念設計
+6. 人物動態與版面構圖
+7. 線條清晰度與細節勾勒
+8. 色彩漸變與立體光影
 
-請依序針對 8 項評審項目進行全面分析，評分標尺為 0 至 5（整數，多數落在 2 至 4 分區間）：
-5: 展示豐富而全面地運用 (進階)
-4: 良好運用 (進階)
-3: 有效地運用 (基礎)
-2: 局部地運用 (基礎)
-1: 可見嘗試運用，但仍需改善 (需改善)
-0: 從沒運用 (需改善)
-
-請針對每一項分別提供具體的：
-a. 欣賞之處 (praise)：精準指出畫作中的成功筆觸、構思與亮點。
-b. 不足之處及改善意見 (suggestion)：給予學生具體可執行的深化建議。`;
+每項必須提供：
+a. 欣賞之處 (praise)
+b. 不足之處及改善意見 (suggestion)`;
 
       const jsonSchema = {
         type: "object",
@@ -705,159 +513,144 @@ b. 不足之處及改善意見 (suggestion)：給予學生具體可執行的深�
 
       if (!response.ok) {
         const errJson = await response.json();
-        throw new Error(errJson.error?.message || `API 請求失敗 (${response.status})`);
+        throw new Error(errJson.error?.message || `請求失敗 (${response.status})`);
       }
 
       const resData = await response.json();
       return JSON.parse(resData.candidates[0].content.parts[0].text);
     }
 
-    function applyEvaluationResults(data) {
-      if (!data.scores || !Array.isArray(data.scores)) return;
-      data.scores.forEach((item, idx) => {
-        if (idx < 8) {
-          currentCriteriaScores[idx] = typeof item.score === 'number' ? item.score : 3;
-          currentPraises[idx] = item.praise || "能有效呈現該項目之基礎特色。";
-          currentSuggestions[idx] = item.suggestion || "細部處理與層次過渡可再加強。";
-        }
-      });
-      renderCriteriaCards();
-      updateOverallLevelAndChart();
+    // 本地示範評估
+    function generateLocalMockEvaluation(concept) {
+      return {
+        scores: [
+          { id: 1, score: 4, praise: `清楚呈現出所選漢服形制特徵（如 ${concept.hanfu.substring(0, 16)}...），門襟與比例自然流暢。`, suggestion: "衣緣邊界轉折處可再加強對齊，使結構更為嚴密考究。" },
+          { id: 2, score: 4, praise: `將現代剪裁與配件（${concept.modern.substring(0, 16)}...）融合恰當，具備當代實穿美感。`, suggestion: "現代功能性配件與漢服軟質布料的銜接可多作視覺過渡處理。" },
+          { id: 3, score: 3, praise: `圖案意念（${concept.pattern.substring(0, 14)}...）佈局具備基本概念。`, suggestion: "紋樣大小與幾何排布可配合服裝動態做疏密變化，提升視覺節奏感。" },
+          { id: 4, score: 3, praise: "外衣與內搭層次穿戴結構邏輯合理。", suggestion: "可透過筆觸進一步突出不同面料（如棉麻、絲綢或金屬）之質感對比。" },
+          { id: 5, score: 4, praise: "構思擺脫傳統舞台古裝的刻板印象，個人原創風格鮮明。", suggestion: "可嘗試在細節處加入更多打破常規的巧思，讓主題更具衝擊力。" },
+          { id: 6, score: 4, praise: "人體比例協調，姿態優雅舒展，畫面主次分明。", suggestion: "下裳邊緣擺動感若能增強弧度曲線，整體動態會更加靈動。" },
+          { id: 7, score: 3, praise: "主要輪廓線條順暢，服裝外形清晰可辨。", suggestion: "褶皺與繫帶交接處線條略顯重複毛糙，建議減少複筆以維持俐落感。" },
+          { id: 8, score: 4, praise: "色調協調，漸變自然柔和，展現出典雅的東方美感。", suggestion: "暗部陰影對比若再加深一階，服裝的空間深度與立體感會更為顯著。" }
+        ]
+      };
     }
 
-    // 渲染 8 項橫向程度按鈕與雙向回饋卡片
-    function renderCriteriaCards() {
-      const container = document.getElementById('criteriaList');
-      container.innerHTML = '';
+    // 渲染 8 項橫向程度坐標與 a/b 雙向意見
+    function renderEvaluationResults(data) {
+      if (emptyNotice) emptyNotice.remove();
+      criteriaList.innerHTML = '';
 
-      CRITERIA_DEFINITIONS.forEach((def, index) => {
-        const score = currentCriteriaScores[index];
-        const praise = currentPraises[index] || "";
-        const suggestion = currentSuggestions[index] || "";
-
+      data.scores.forEach((item, index) => {
+        currentCriteriaScores[index] = item.score;
+        const def = CRITERIA_DEFINITIONS.find(d => d.id === item.id) || { category: "評核項目", name: `項目 ${item.id}`, guide: "" };
+        
         const card = document.createElement('div');
-        card.className = "bg-white border border-stone-200 rounded-xl p-3.5 sm:p-4 shadow-2xs hover:border-stone-300 transition print-break";
-
-        // 橫向 6 級程度按鈕 HTML
+        card.className = "bg-white border border-stone-200 rounded p-3.5 shadow-sm print-page-break";
+        
         let stepsHtml = SCALE_LEVELS.map(lvl => {
-          const isActive = lvl.score === score;
-          return `
-            <button type="button" 
-              class="level-step-btn ${isActive ? 'active' : 'inactive'}" 
-              onclick="onStepClick(${index}, ${lvl.score})"
-              title="${lvl.label}">
-              <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-stone-400'}"></span>
-              ${lvl.label}
-            </button>
-          `;
+          const isActive = lvl.score === item.score;
+          return `<button type="button" class="level-step-btn ${isActive ? 'active' : 'inactive'}" 
+                    data-crit-index="${index}" data-score="${lvl.score}">
+                    ${lvl.label}
+                  </button>`;
         }).join('<span class="text-stone-300 text-[10px] self-center">›</span>');
 
         card.innerHTML = `
-          <!-- 項目標題與指標說明 -->
           <div class="mb-2">
             <div class="flex items-center gap-1.5 mb-1">
-              <span class="text-[10px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded">${def.category}</span>
-              <span class="font-bold text-stone-900 text-xs sm:text-sm font-serif-tc">${def.id}. ${def.name}</span>
+              <span class="text-[10px] font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded">${def.category}</span>
+              <span class="font-bold text-stone-800 text-xs sm:text-sm">${item.id}. ${def.name}</span>
             </div>
-            <p class="text-[11px] text-stone-500 leading-tight">${def.guide}</p>
+            <p class="text-[11px] text-stone-400 leading-tight">${def.guide}</p>
           </div>
 
-          <!-- 橫向程度坐標欄 (支援 iPad 觸控水平流暢滾動) -->
-          <div class="mb-2.5 overflow-x-auto pb-1">
-            <div class="flex items-center gap-1 min-w-max p-1 bg-stone-50 rounded-lg border border-stone-200">
+          <!-- 橫向程度坐標欄 (支援 iPad 平滑滑動) -->
+          <div class="mb-2.5 overflow-x-auto pb-1 scroll-touch">
+            <div class="flex items-center gap-1 min-w-max p-1 bg-stone-50 rounded border border-stone-200">
               ${stepsHtml}
             </div>
           </div>
 
-          <!-- 評核回饋：a. 欣賞之處 與 b. 不足之處及改善意見 -->
-          <div class="bg-stone-50 rounded-lg p-3 border border-stone-200 space-y-2.5 text-xs">
+          <!-- a. 欣賞之處 與 b. 不足之處及改善意見 -->
+          <div class="bg-stone-50 rounded p-2.5 border border-stone-200 space-y-2 text-xs">
             <div>
-              <label class="font-bold text-emerald-800 flex items-center gap-1.5 mb-1">
-                <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-                <span>a. 欣賞之處：</span>
-              </label>
-              <textarea oninput="currentPraises[${index}]=this.value" 
-                class="w-full bg-white border border-stone-200 rounded-md p-2 text-stone-700 focus:outline-none focus:border-cinnabar resize-y font-normal leading-relaxed text-[11px]" 
-                rows="2">${praise}</textarea>
+              <span class="font-bold text-stone-700 block mb-1 flex items-center">
+                <span class="w-1.5 h-1.5 bg-emerald-600 rounded-full mr-1.5"></span>a. 欣賞之處：
+              </span>
+              <textarea class="w-full bg-white border border-stone-200 rounded p-2 text-stone-700 focus:outline-none focus:border-cinnabar resize-y leading-relaxed font-normal" rows="2">${item.praise || item.feedback || ''}</textarea>
             </div>
-
             <div>
-              <label class="font-bold text-cinnabar flex items-center gap-1.5 mb-1">
-                <span class="w-2 h-2 rounded-full bg-cinnabar inline-block"></span>
-                <span>b. 不足之處及改善意見：</span>
-              </label>
-              <textarea oninput="currentSuggestions[${index}]=this.value" 
-                class="w-full bg-white border border-stone-200 rounded-md p-2 text-stone-700 focus:outline-none focus:border-cinnabar resize-y font-normal leading-relaxed text-[11px]" 
-                rows="2">${suggestion}</textarea>
+              <span class="font-bold text-stone-700 block mb-1 flex items-center">
+                <span class="w-1.5 h-1.5 bg-cinnabar rounded-full mr-1.5"></span>b. 不足之處及改善意見：
+              </span>
+              <textarea class="w-full bg-white border border-stone-200 rounded p-2 text-stone-700 focus:outline-none focus:border-cinnabar resize-y leading-relaxed font-normal" rows="2">${item.suggestion || ''}</textarea>
             </div>
           </div>
         `;
-        container.appendChild(card);
+        criteriaList.appendChild(card);
       });
-    }
 
-    function onStepClick(critIndex, newScore) {
-      currentCriteriaScores[critIndex] = newScore;
-      renderCriteriaCards();
+      // 監聽橫向標籤點擊事件 (iPad/電腦雙相容)
+      document.querySelectorAll('.level-step-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const critIndex = parseInt(btn.getAttribute('data-crit-index'));
+          const newScore = parseInt(btn.getAttribute('data-score'));
+          currentCriteriaScores[critIndex] = newScore;
+
+          const parentGroup = btn.parentElement;
+          parentGroup.querySelectorAll('.level-step-btn').forEach(b => {
+            b.classList.remove('active');
+            b.classList.add('inactive');
+          });
+          btn.classList.add('active');
+          btn.classList.remove('inactive');
+
+          updateOverallLevelAndChart();
+        });
+      });
+
+      summaryCard.classList.remove('hidden');
       updateOverallLevelAndChart();
     }
 
-    // 嚴格落實 5 級評分表現範圍判定（不顯示阿拉伯數字總分）
+    // 更新作品整體表現程度
     function updateOverallLevelAndChart() {
       const sum = currentCriteriaScores.reduce((acc, curr) => acc + curr, 0);
 
       let levelText = "";
-      let levelClass = "";
-      let activeTierId = "";
+      let levelStyle = "";
 
-      // 卓越 (33-40) | 熟練 (25-32) | 基礎/達標 (20-24) | 部分達標 (16-19) | 尚未掌握核心能力 (0-15)
       if (sum >= 33) {
         levelText = "卓越";
-        levelClass = "bg-cinnabar";
-        activeTierId = "tier-level-5";
+        levelStyle = "bg-red-800 text-white";
       } else if (sum >= 25) {
         levelText = "熟練";
-        levelClass = "bg-amber-800";
-        activeTierId = "tier-level-4";
+        levelStyle = "bg-amber-700 text-white";
       } else if (sum >= 20) {
         levelText = "基礎 / 達標";
-        levelClass = "bg-emerald-700";
-        activeTierId = "tier-level-3";
+        levelStyle = "bg-emerald-700 text-white";
       } else if (sum >= 16) {
         levelText = "部分達標，但表現不夠穩定";
-        levelClass = "bg-orange-600";
-        activeTierId = "tier-level-2";
+        levelStyle = "bg-orange-600 text-white";
       } else {
         levelText = "尚未掌握核心能力";
-        levelClass = "bg-stone-600";
-        activeTierId = "tier-level-1";
+        levelStyle = "bg-stone-600 text-white";
       }
 
-      // 更新徽章
-      const badge = document.getElementById('overallLevelBadge');
-      badge.textContent = levelText;
-      badge.className = `inline-block px-5 py-1.5 rounded-full text-xs font-bold text-white shadow-xs transition-all ${levelClass}`;
+      currentLevelDisplay.textContent = levelText;
+      currentLevelDisplay.className = `inline-block px-5 py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-sm transition-all ${levelStyle}`;
 
-      // 更新 5 級範圍指示器
-      ["tier-level-5", "tier-level-4", "tier-level-3", "tier-level-2", "tier-level-1"].forEach(tid => {
-        const el = document.getElementById(tid);
-        if (tid === activeTierId) {
-          el.className = "px-2 py-0.5 rounded font-bold bg-cinnabar/15 text-cinnabar border border-cinnabar/30";
-        } else {
-          el.className = "px-2 py-0.5 rounded text-stone-400 bg-stone-100";
-        }
-      });
-
-      drawOrUpdateRadarChart(currentCriteriaScores);
+      updateRadarChart(currentCriteriaScores);
     }
 
-    // 繪製或更新 Chart.js 雷達維度圖（隱藏刻度數字，純看形態分佈）
-    function drawOrUpdateRadarChart(scores) {
-      const labels = CRITERIA_DEFINITIONS.map(d => `${d.id}. ${d.name.substring(0, 4)}..`);
+    // 雷達圖繪製
+    function updateRadarChart(scoreValues) {
+      const labels = CRITERIA_DEFINITIONS.map(d => `${d.id}.${d.name.substring(0, 3)}..`);
       const ctx = document.getElementById('radarChart').getContext('2d');
 
       if (radarChartInstance) {
-        radarChartInstance.data.datasets[0].data = scores;
+        radarChartInstance.data.datasets[0].data = scoreValues;
         radarChartInstance.update();
         return;
       }
@@ -868,14 +661,13 @@ b. 不足之處及改善意見 (suggestion)：給予學生具體可執行的深�
           labels: labels,
           datasets: [{
             label: '掌握水平',
-            data: scores,
-            backgroundColor: 'rgba(168, 56, 54, 0.22)',
+            data: scoreValues,
+            backgroundColor: 'rgba(168, 56, 54, 0.25)',
             borderColor: '#a83836',
             borderWidth: 2,
             pointBackgroundColor: '#a83836',
-            pointBorderColor: '#ffffff',
-            pointRadius: 3.5,
-            pointHoverRadius: 5
+            pointBorderColor: '#fff',
+            pointRadius: 3
           }]
         },
         options: {
@@ -885,34 +677,25 @@ b. 不足之處及改善意見 (suggestion)：給予學生具體可執行的深�
             r: {
               min: 0,
               max: 5,
-              ticks: { display: false, stepSize: 1 },
-              grid: { color: 'rgba(0, 0, 0, 0.07)' },
-              angleLines: { color: 'rgba(0, 0, 0, 0.09)' },
+              ticks: { display: false },
+              grid: { color: 'rgba(0, 0, 0, 0.06)' },
+              angleLines: { color: 'rgba(0, 0, 0, 0.08)' },
               pointLabels: {
                 font: { size: 10, family: "'Noto Sans TC', sans-serif" },
-                color: '#444444'
+                color: '#555'
               }
             }
           },
           plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const val = context.raw;
-                  const lvlObj = SCALE_LEVELS.find(l => l.score === val);
-                  return ` 水平：${lvlObj ? lvlObj.label : val}`;
-                }
-              }
-            }
+            legend: { display: false }
           }
         }
       });
     }
 
-    function toggleApiHelp() {
-      document.getElementById('helpModal').classList.toggle('hidden');
-    }
+    document.getElementById('toggleApiHelp').addEventListener('click', () => {
+      alert("【系統使用指引】\n1. 填選漢服形制、現代元素及圖案意念，供 AI 或教師進行針對性對照。\n2. 上傳或拍攝作品後點擊「開始評估作品」。\n3. 系統不會顯示任何數字總分，僅呈現「卓越、熟練、基礎/達標、部分達標、尚未掌握核心能力」等程度判定。\n4. 各項指標均提供「a. 欣賞之處」與「b. 不足之處及改善意見」，可隨時手動微調並匯出列印。");
+    });
   </script>
 </body>
 </html>
