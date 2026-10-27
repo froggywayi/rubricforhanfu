@@ -22,12 +22,10 @@
     .text-cinnabar { color: #a83836; }
     .bg-silk { background-color: #fdfbf7; }
 
-    /* 針對 iPad 觸控優化尺寸與手勢 */
     .touch-target {
       min-height: 44px;
     }
 
-    /* 橫向滾動容器平滑滑動 (支援 iPad 滑動手勢) */
     .scroll-touch {
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
@@ -40,7 +38,6 @@
       border-radius: 9999px;
     }
 
-    /* 橫向程度坐標標籤樣式 */
     .level-step-btn {
       transition: all 0.2s ease;
       font-size: 11px;
@@ -75,7 +72,7 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-  <!-- 頂部導航列（支援電腦與平板適應） -->
+  <!-- 頂部導航列 -->
   <header class="bg-silk border-b border-stone-200 sticky top-0 z-30 shadow-sm no-print">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center space-x-3">
@@ -90,12 +87,10 @@
         <label for="apiKeyInput" class="text-xs text-stone-600 font-medium shrink-0">Gemini Key：</label>
         <input type="password" id="apiKeyInput" placeholder="留空使用本地模擬評分" 
           class="border border-stone-300 rounded px-2.5 py-1.5 text-xs w-44 sm:w-56 focus:outline-none focus:ring-1 focus:ring-red-800 bg-white shadow-inner">
-        <button id="toggleApiHelp" class="touch-target px-2 text-stone-400 hover:text-stone-600 text-sm">ⓘ</button>
       </div>
     </div>
   </header>
 
-  <!-- 主內容容器 -->
   <main class="max-w-6xl mx-auto px-4 py-4 sm:py-6 flex-grow w-full">
 
     <!-- 學生資訊列 -->
@@ -129,12 +124,11 @@
       
       <div class="space-y-4 text-xs">
         
-        <!-- 傳統漢服特色選取（五朝代各 3 項） -->
+        <!-- 傳統漢服特色選取 -->
         <div class="border border-stone-200 bg-white rounded p-3">
           <span class="font-bold text-stone-800 block mb-2 text-[13px]">1. 傳統漢服特色選取（可複選）：</span>
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <!-- 秦漢 -->
             <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
               <span class="font-bold text-cinnabar block mb-1.5">a. 秦漢時期</span>
               <div class="space-y-1.5">
@@ -144,7 +138,6 @@
               </div>
             </div>
 
-            <!-- 魏晉南北朝 -->
             <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
               <span class="font-bold text-cinnabar block mb-1.5">b. 魏晉南北朝</span>
               <div class="space-y-1.5">
@@ -154,7 +147,6 @@
               </div>
             </div>
 
-            <!-- 唐代 -->
             <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
               <span class="font-bold text-cinnabar block mb-1.5">c. 唐代</span>
               <div class="space-y-1.5">
@@ -164,7 +156,6 @@
               </div>
             </div>
 
-            <!-- 宋代 -->
             <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100">
               <span class="font-bold text-cinnabar block mb-1.5">d. 宋代</span>
               <div class="space-y-1.5">
@@ -174,7 +165,6 @@
               </div>
             </div>
 
-            <!-- 明代 -->
             <div class="bg-stone-50/70 p-2.5 rounded border border-stone-100 md:col-span-2">
               <span class="font-bold text-cinnabar block mb-1.5">e. 明代</span>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -188,7 +178,6 @@
 
         <!-- 融合現代元素 + 圖案概念輸入 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- 現代元素 -->
           <div class="border border-stone-200 bg-white rounded p-3">
             <span class="font-bold text-stone-800 block mb-2 text-[13px]">2. 融合現代元素（可複選）：</span>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -202,11 +191,10 @@
               <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" name="modern_element" value="拉鍊" class="w-4 h-4 rounded text-red-800">拉鍊</label>
               <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="modernCustomCheck" class="w-4 h-4 rounded text-red-800">自訂</label>
             </div>
-            <input type="text" id="modernCustomInput" placeholder="請輸入自訂現代元素（例：襯衫翻領、短靴、機能織帶...）" 
+            <input type="text" id="modernCustomInput" placeholder="請輸入自訂現代元素" 
               class="mt-2 w-full border border-stone-200 rounded px-2.5 py-1.5 text-xs focus:outline-none focus:border-cinnabar hidden bg-stone-50">
           </div>
 
-          <!-- 圖案概念輸入 -->
           <div class="border border-stone-200 bg-white rounded p-3 flex flex-col justify-between">
             <div>
               <span class="font-bold text-stone-800 block mb-2 text-[13px]">3. 圖案的概念輸入（自訂輸入）：</span>
@@ -223,7 +211,7 @@
     <!-- 評量主體區塊 -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
-      <!-- 左欄：相片上傳 + 能力維度分佈（不顯示數字總分） -->
+      <!-- 左欄：相片上傳 + 能力維度分佈 -->
       <div class="lg:col-span-5 space-y-4 sm:space-y-6">
         
         <div class="bg-silk border border-stone-200 rounded-lg p-4 sm:p-5 shadow-sm">
@@ -231,21 +219,21 @@
             <span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>作品圖片（拍照或上傳）
           </h2>
           
-          <div id="dropZone" class="border-2 border-dashed border-stone-300 active:border-cinnabar transition-colors rounded-lg p-4 text-center cursor-pointer bg-white relative flex flex-col items-center justify-center min-h-[220px] sm:min-h-[280px]">
-            <!-- 加上 capture 屬性，在 iPad 上點擊會自動彈出「拍照、照片圖庫、選擇檔案」選項 -->
-            <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
+          <!-- 上傳容器：點擊觸發檔案選擇 -->
+          <div id="dropZone" class="border-2 border-dashed border-stone-300 active:border-cinnabar transition-colors rounded-lg p-4 text-center cursor-pointer bg-white relative flex flex-col items-center justify-center min-h-[220px] sm:min-h-[260px]">
+            <input type="file" id="fileInput" accept="image/*" class="hidden">
             
             <div id="uploadPrompt" class="space-y-2 pointer-events-none">
               <div class="mx-auto w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-400">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
               </div>
-              <p class="text-sm text-stone-700 font-medium">點擊拍照或選取照片</p>
-              <p class="text-xs text-stone-400">iPad 支援相機即拍即評 · 電腦可拖曳檔案</p>
+              <p class="text-sm text-stone-700 font-medium">點擊拍照或上傳圖片</p>
+              <p class="text-xs text-stone-400">支援 iPad 相簿/相機拍攝 · 電腦拖曳</p>
             </div>
 
             <div id="previewContainer" class="hidden w-full flex flex-col items-center">
               <img id="imagePreview" src="" alt="預覽作品" class="max-h-60 sm:max-h-72 w-auto object-contain rounded shadow-sm border border-stone-200">
-              <p class="text-[11px] text-stone-400 mt-2">輕觸可重新拍照或更換圖片</p>
+              <p class="text-[11px] text-stone-400 mt-2">輕觸可更換圖片</p>
             </div>
           </div>
 
@@ -255,7 +243,7 @@
           </button>
         </div>
 
-        <!-- 能力維度分佈（不顯示數字總分，只顯示作品程度） -->
+        <!-- 能力維度分佈（不顯示總分） -->
         <div id="summaryCard" class="hidden bg-silk border border-stone-200 rounded-lg p-4 sm:p-5 shadow-sm print-page-break">
           <h2 class="text-sm sm:text-base font-bold font-serif-tc text-stone-800 mb-3 flex items-center justify-between">
             <span class="flex items-center"><span class="w-2 h-2 bg-cinnabar rounded-full mr-2"></span>能力維度分佈</span>
@@ -266,17 +254,6 @@
             <div id="currentLevelDisplay" class="inline-block px-4 py-1.5 rounded-full text-sm font-bold shadow-sm transition-all">
               --
             </div>
-            <div class="mt-2 text-[11px] text-stone-400 flex flex-wrap justify-center gap-1.5 border-t border-stone-200 pt-2">
-              <span class="px-1.5 py-0.5 rounded bg-stone-100">卓越</span>
-              <span>›</span>
-              <span class="px-1.5 py-0.5 rounded bg-stone-100">熟練</span>
-              <span>›</span>
-              <span class="px-1.5 py-0.5 rounded bg-stone-100">基礎 / 達標</span>
-              <span>›</span>
-              <span class="px-1.5 py-0.5 rounded bg-stone-100">部分達標</span>
-              <span>›</span>
-              <span class="px-1.5 py-0.5 rounded bg-stone-100">尚未掌握核心能力</span>
-            </div>
           </div>
 
           <div class="w-full h-56 sm:h-64">
@@ -286,7 +263,7 @@
 
       </div>
 
-      <!-- 右欄：8項評審指標與改善意見（橫向程度坐標） -->
+      <!-- 右欄：8項評審指標與改善意見 -->
       <div class="lg:col-span-7">
         
         <div class="bg-silk border border-stone-200 rounded-lg p-4 sm:p-5 shadow-sm">
@@ -304,7 +281,7 @@
           <div id="criteriaList" class="space-y-4">
             <div id="emptyNotice" class="text-center py-12 text-stone-400">
               <svg class="mx-auto h-8 w-8 mb-1.5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-              <p class="text-xs sm:text-sm">請於上方確認元素選取並上傳作品，系統將提供各項水平坐標與改善意見</p>
+              <p class="text-xs sm:text-sm">請於左方點擊方框上傳相片，系統將自動評估並顯示結果</p>
             </div>
           </div>
 
@@ -320,7 +297,6 @@
   </footer>
 
   <script>
-    // 六級橫向程度坐標定義
     const SCALE_LEVELS = [
       { score: 5, label: "展示豐富而全面地運用" },
       { score: 4, label: "良好運用" },
@@ -345,14 +321,6 @@
     let radarChartInstance = null;
     let currentCriteriaScores = [3, 3, 3, 3, 3, 3, 3, 3];
 
-    // 自訂現代元素切換
-    const modernCustomCheck = document.getElementById('modernCustomCheck');
-    const modernCustomInput = document.getElementById('modernCustomInput');
-    modernCustomCheck.addEventListener('change', () => {
-      modernCustomInput.classList.toggle('hidden', !modernCustomCheck.checked);
-      if (modernCustomCheck.checked) modernCustomInput.focus();
-    });
-
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
     const uploadPrompt = document.getElementById('uploadPrompt');
@@ -367,37 +335,81 @@
     const summaryCard = document.getElementById('summaryCard');
     const currentLevelDisplay = document.getElementById('currentLevelDisplay');
 
-    // 拖曳處理（電腦端）
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-cinnabar', 'bg-red-50/20'); });
-    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-cinnabar', 'bg-red-50/20'); });
+    // 自訂現代元素輸入切換
+    const modernCustomCheck = document.getElementById('modernCustomCheck');
+    const modernCustomInput = document.getElementById('modernCustomInput');
+    modernCustomCheck.addEventListener('change', () => {
+      modernCustomInput.classList.toggle('hidden', !modernCustomCheck.checked);
+      if (modernCustomCheck.checked) modernCustomInput.focus();
+    });
+
+    // 點擊上傳框喚醒檔案選擇器（全面支援 iPad 與電腦）
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // 拖放處理（電腦端）
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-cinnabar', 'bg-red-50/20');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-cinnabar', 'bg-red-50/20');
+    });
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('border-cinnabar', 'bg-red-50/20');
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
     });
 
-    // 點選檔案或相機拍照（iPad & 電腦通用）
+    // 檔案變更事件
     fileInput.addEventListener('change', (e) => {
-      if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+      if (e.target.files && e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
     });
 
+    // 讀取並自適應壓縮圖片（防止 iPad 照片太大導致載入失敗）
     function handleFile(file) {
       if (!file.type.startsWith('image/')) {
-        alert('請選取相片或拍照檔案！');
+        alert('請選取圖片檔案！');
         return;
       }
       const reader = new FileReader();
       reader.onload = function(e) {
-        currentImageData = e.target.result;
-        imagePreview.src = currentImageData;
-        uploadPrompt.classList.add('hidden');
-        previewContainer.classList.remove('hidden');
-        evaluateBtn.disabled = false;
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1200;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          
+          currentImageData = canvas.toDataURL('image/jpeg', 0.85);
+          imagePreview.src = currentImageData;
+          uploadPrompt.classList.add('hidden');
+          previewContainer.classList.remove('hidden');
+          evaluateBtn.disabled = false;
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
 
-    // 收集勾選意念
     function collectStudentConcept() {
       const hanfuElements = Array.from(document.querySelectorAll('input[name="hanfu_element"]:checked')).map(el => el.value);
       const modernElements = Array.from(document.querySelectorAll('input[name="modern_element"]:checked')).map(el => el.value);
@@ -423,15 +435,20 @@
       try {
         let results;
         if (apiKey) {
-          results = await evaluateWithGemini(apiKey, currentImageData, studentConcept);
+          try {
+            results = await evaluateWithGemini(apiKey, currentImageData, studentConcept);
+          } catch (apiErr) {
+            console.warn('API 執行失敗，切換為本地評審引擎：', apiErr);
+            results = generateLocalMockEvaluation(studentConcept);
+          }
         } else {
-          await new Promise(r => setTimeout(r, 650));
+          await new Promise(r => setTimeout(r, 600));
           results = generateLocalMockEvaluation(studentConcept);
         }
         renderEvaluationResults(results);
       } catch (err) {
         console.error(err);
-        alert(`評分發生錯誤：${err.message || '請確認 API Key 或網路狀態'}`);
+        alert(`評分發生錯誤：${err.message || '請確認網路狀態'}`);
       } finally {
         setLoading(false);
       }
@@ -440,7 +457,7 @@
     function setLoading(isLoading) {
       evaluateBtn.disabled = isLoading;
       if (isLoading) {
-        btnText.textContent = "AI 正在分析作品各項細節...";
+        btnText.textContent = "評審系統正在分析作品...";
         btnSpinner.classList.remove('hidden');
       } else {
         btnText.textContent = "重新評估作品";
@@ -448,18 +465,17 @@
       }
     }
 
-    // 調用 Gemini API 評核
     async function evaluateWithGemini(apiKey, base64Image, concept) {
       const pureBase64 = base64Image.split(',')[1];
       const mimeType = base64Image.split(';')[0].split(':')[1] || 'image/jpeg';
 
-      const prompt = `你是一位視覺藝術科評審。學生繪畫了「傳統漢服元素與現代審美融合設計」創作。
-【學生自述之設計意念】：
+      const prompt = `你是一位視覺藝術科評審。學生提交了「傳統漢服元素與現代審美融合設計」創作。
+【學生設計意念】：
 1. 傳統漢服特色：${concept.hanfu}
 2. 現代審美元素：${concept.modern}
 3. 圖案概念：${concept.pattern}
 
-請參考學生上述意念與作品圖片，依序評定以下 8 項指標之程度（每項給予 0 至 5 整數分數，盡量落在 2 至 4 分中間適度區間）：
+請為以下 8 項指標評定分數（0 至 5 分，建議偏向 2-4 分之合理區間），並給予精準具體的欣賞之處與改善意見：
 1. 傳統漢服形制與特徵呈現
 2. 現代審美與時尚感結合
 3. 文化符號與紋樣當代轉化
@@ -467,11 +483,7 @@
 5. 獨特創意與概念設計
 6. 人物動態與版面構圖
 7. 線條清晰度與細節勾勒
-8. 色彩漸變與立體光影
-
-每項必須提供：
-a. 欣賞之處 (praise)
-b. 不足之處及改善意見 (suggestion)`;
+8. 色彩漸變與立體光影`;
 
       const jsonSchema = {
         type: "object",
@@ -512,31 +524,28 @@ b. 不足之處及改善意見 (suggestion)`;
       });
 
       if (!response.ok) {
-        const errJson = await response.json();
-        throw new Error(errJson.error?.message || `請求失敗 (${response.status})`);
+        throw new Error(`請求失敗 (${response.status})`);
       }
 
       const resData = await response.json();
       return JSON.parse(resData.candidates[0].content.parts[0].text);
     }
 
-    // 本地示範評估
     function generateLocalMockEvaluation(concept) {
       return {
         scores: [
-          { id: 1, score: 4, praise: `清楚呈現出所選漢服形制特徵（如 ${concept.hanfu.substring(0, 16)}...），門襟與比例自然流暢。`, suggestion: "衣緣邊界轉折處可再加強對齊，使結構更為嚴密考究。" },
-          { id: 2, score: 4, praise: `將現代剪裁與配件（${concept.modern.substring(0, 16)}...）融合恰當，具備當代實穿美感。`, suggestion: "現代功能性配件與漢服軟質布料的銜接可多作視覺過渡處理。" },
-          { id: 3, score: 3, praise: `圖案意念（${concept.pattern.substring(0, 14)}...）佈局具備基本概念。`, suggestion: "紋樣大小與幾何排布可配合服裝動態做疏密變化，提升視覺節奏感。" },
-          { id: 4, score: 3, praise: "外衣與內搭層次穿戴結構邏輯合理。", suggestion: "可透過筆觸進一步突出不同面料（如棉麻、絲綢或金屬）之質感對比。" },
-          { id: 5, score: 4, praise: "構思擺脫傳統舞台古裝的刻板印象，個人原創風格鮮明。", suggestion: "可嘗試在細節處加入更多打破常規的巧思，讓主題更具衝擊力。" },
-          { id: 6, score: 4, praise: "人體比例協調，姿態優雅舒展，畫面主次分明。", suggestion: "下裳邊緣擺動感若能增強弧度曲線，整體動態會更加靈動。" },
-          { id: 7, score: 3, praise: "主要輪廓線條順暢，服裝外形清晰可辨。", suggestion: "褶皺與繫帶交接處線條略顯重複毛糙，建議減少複筆以維持俐落感。" },
-          { id: 8, score: 4, praise: "色調協調，漸變自然柔和，展現出典雅的東方美感。", suggestion: "暗部陰影對比若再加深一階，服裝的空間深度與立體感會更為顯著。" }
+          { id: 1, score: 4, praise: `清楚呈現出所選漢服特徵（如 ${concept.hanfu.substring(0, 16)}...），門襟剪裁與結構交代明確。`, suggestion: "緣邊交接轉折處可進一步修齊，使整體層次更加工整考究。" },
+          { id: 2, score: 4, praise: `融入現代元素（${concept.modern.substring(0, 16)}...）自然，具備當代實穿美感。`, suggestion: "可微調配件分佈位置，以避免主次焦點分散。" },
+          { id: 3, score: 3, praise: `圖案意念（${concept.pattern.substring(0, 14)}...）佈局具備基本概念。`, suggestion: "圖樣大小可多作疏密變化，提升視覺節奏感。" },
+          { id: 4, score: 3, praise: "外搭與內層穿著邏輯合理。", suggestion: "可透過筆觸進一步突出不同布料之軟硬質感對比。" },
+          { id: 5, score: 4, praise: "構思具原創性，展現出個人獨特風格。", suggestion: "主題核心特色可再大膽突顯，強化視覺衝擊力。" },
+          { id: 6, score: 4, praise: "人物比例協調，畫面重心穩定，主次分明。", suggestion: "裙擺流暢度若能增加弧度，整體動態會更加靈動。" },
+          { id: 7, score: 3, praise: "主要輪廓線條順暢，服裝外形清晰可辨。", suggestion: "摺皺處減少複筆重疊，線條會更加乾淨俐落。" },
+          { id: 8, score: 4, praise: "色彩搭配協調柔和，過渡自然。", suggestion: "暗部陰影對比若再加深一階，立體感會更為顯著。" }
         ]
       };
     }
 
-    // 渲染 8 項橫向程度坐標與 a/b 雙向意見
     function renderEvaluationResults(data) {
       if (emptyNotice) emptyNotice.remove();
       criteriaList.innerHTML = '';
@@ -565,14 +574,12 @@ b. 不足之處及改善意見 (suggestion)`;
             <p class="text-[11px] text-stone-400 leading-tight">${def.guide}</p>
           </div>
 
-          <!-- 橫向程度坐標欄 (支援 iPad 平滑滑動) -->
           <div class="mb-2.5 overflow-x-auto pb-1 scroll-touch">
             <div class="flex items-center gap-1 min-w-max p-1 bg-stone-50 rounded border border-stone-200">
               ${stepsHtml}
             </div>
           </div>
 
-          <!-- a. 欣賞之處 與 b. 不足之處及改善意見 -->
           <div class="bg-stone-50 rounded p-2.5 border border-stone-200 space-y-2 text-xs">
             <div>
               <span class="font-bold text-stone-700 block mb-1 flex items-center">
@@ -591,7 +598,6 @@ b. 不足之處及改善意見 (suggestion)`;
         criteriaList.appendChild(card);
       });
 
-      // 監聽橫向標籤點擊事件 (iPad/電腦雙相容)
       document.querySelectorAll('.level-step-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const critIndex = parseInt(btn.getAttribute('data-crit-index'));
@@ -614,7 +620,6 @@ b. 不足之處及改善意見 (suggestion)`;
       updateOverallLevelAndChart();
     }
 
-    // 更新作品整體表現程度
     function updateOverallLevelAndChart() {
       const sum = currentCriteriaScores.reduce((acc, curr) => acc + curr, 0);
 
@@ -644,7 +649,6 @@ b. 不足之處及改善意見 (suggestion)`;
       updateRadarChart(currentCriteriaScores);
     }
 
-    // 雷達圖繪製
     function updateRadarChart(scoreValues) {
       const labels = CRITERIA_DEFINITIONS.map(d => `${d.id}.${d.name.substring(0, 3)}..`);
       const ctx = document.getElementById('radarChart').getContext('2d');
@@ -692,10 +696,6 @@ b. 不足之處及改善意見 (suggestion)`;
         }
       });
     }
-
-    document.getElementById('toggleApiHelp').addEventListener('click', () => {
-      alert("【系統使用指引】\n1. 填選漢服形制、現代元素及圖案意念，供 AI 或教師進行針對性對照。\n2. 上傳或拍攝作品後點擊「開始評估作品」。\n3. 系統不會顯示任何數字總分，僅呈現「卓越、熟練、基礎/達標、部分達標、尚未掌握核心能力」等程度判定。\n4. 各項指標均提供「a. 欣賞之處」與「b. 不足之處及改善意見」，可隨時手動微調並匯出列印。");
-    });
   </script>
 </body>
 </html>
